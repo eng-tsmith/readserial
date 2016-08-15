@@ -5,6 +5,26 @@
 #include <termios.h>
 #include <string.h> // needed for memset
 
+
+const char *byte_to_binary(int x)
+{
+    static char b[9];
+    b[0] = '\0';
+
+    int z;
+    for (z = 128; z > 0; z >>= 1)
+    {
+        strcat(b, ((x & z) == z) ? "1" : "0");
+    }
+
+    return b;
+}
+
+
+
+
+
+
 int main(int argc,char** argv)
 {
         struct termios tio;
@@ -17,6 +37,7 @@ int main(int argc,char** argv)
 
 
         printf("Please start with %s (for example)\n",argv[1]);
+		printf("5 %s\n", byte_to_binary(5));
         memset(&stdio,0,sizeof(stdio));
         stdio.c_iflag=0;
         stdio.c_oflag=0;
