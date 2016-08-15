@@ -32,12 +32,9 @@ int main(int argc,char** argv)
         int tty_fd;
         fd_set rdset;
 
-  //      unsigned char c='D';
-	int c = 0;
-
+        unsigned char c='D';
 
         printf("Please start with %s (for example)\n",argv[1]);
-		printf("5 %s\n", byte_to_binary(5));
         memset(&stdio,0,sizeof(stdio));
         stdio.c_iflag=0;
         stdio.c_oflag=0;
@@ -67,9 +64,12 @@ int main(int argc,char** argv)
         tcsetattr(tty_fd,TCSANOW,&tio);
         while (c!='q')
         {
+
                 if (read(tty_fd,&c,1)>0)        
 		{
-			write(STDOUT_FILENO,&c,1);              // if new data is available on the serial port, print it out
+			//write(STDOUT_FILENO,&c,1);              // if new data is available on the serial port, print it out
+  			printf("%x ", c);
+			fflush(stdout);
 		}                
 		if (read(STDIN_FILENO,&c,1)>0)  
 		{
