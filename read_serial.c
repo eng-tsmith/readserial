@@ -6,25 +6,6 @@
 #include <string.h> // needed for memset
 
 
-const char *byte_to_binary(int x)
-{
-    static char b[9];
-    b[0] = '\0';
-
-    int z;
-    for (z = 128; z > 0; z >>= 1)
-    {
-        strcat(b, ((x & z) == z) ? "1" : "0");
-    }
-
-    return b;
-}
-
-
-
-
-
-
 int main(int argc,char** argv)
 {
         struct termios tio;
@@ -33,6 +14,7 @@ int main(int argc,char** argv)
         fd_set rdset;
 
         unsigned char c='D';
+		int hex_zahl = 0;
 
         printf("Please start with %s (for example)\n",argv[1]);
         memset(&stdio,0,sizeof(stdio));
@@ -62,22 +44,48 @@ int main(int argc,char** argv)
         cfsetispeed(&tio,B57600);            // 115200 baud
 
         tcsetattr(tty_fd,TCSANOW,&tio);
+		
+		
+		FILE *f = fopen("output.txt", "w");
+		if (f == NULL)
+		{
+			printf("Error opening file!\n");
+			exit(1);
+		}
+		
+		int gesamt[100];
+		int pos = 0;
+		int j = 0;
+		
         while (c!='q')
         {
-
-                if (read(tty_fd,&c,1)>0)        
-		{
-			//write(STDOUT_FILENO,&c,1);              // if new data is available on the serial port, print it out
-  			printf("%x ", c);
-			fflush(stdout);
-		}                
+			if (read(tty_fd,&c,1)>0)        
+			{
+				//write(STDOUT_FILENO,&c,1);              // if new data is available on the serial port, print it out
+				hex_zahl = (int)c;
+				//printf("hex: %x int: %x \n", c, hex_zahl);
+				//fflush(stdout);
+				if(hex_zahl == 85)
+				{
+					for(j=0; j<pos; j++) 
+					{
+						fprintf(f, "%x ", gesamt[j]);	
+					}
+					fprintf(f, "\n");
+					
+					printf("Done\n");	
+					pos = 0;
+				}
+			gesamt[pos] = hex_zahl;
+			pos++;
+			}                
 		if (read(STDIN_FILENO,&c,1)>0)  
-		{
-			write(tty_fd,&c,1);                     // if new data is available on the console, send it to the serial port
-		}
+			{
+				write(tty_fd,&c,1);                     // if new data is available on the console, send it to the serial port
+			}
 	}
 
-
 	printf("Exit!");
-        close(tty_fd);
+	fclose(f);
+	close(tty_fd);
 }
